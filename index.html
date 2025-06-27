@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Калькулятор Электроэнергии</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent: #4a90e2;
+      --bg: #f7f9fc;
+      --border: #e1e7ef;
+      --font: #333;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--font);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .calculator {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: calc(100% - 1.2rem);
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #357ac8;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 2rem;
+      border-collapse: collapse;
+      animation: slideUp 0.5s ease;
+    }
+
+    th, td {
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    th {
+      background: var(--bg);
+    }
+
+    tfoot td {
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes slideUp {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h2>Калькулятор электроэнергии</h2>
+    <div class="section">
+      <h3>Текущие показания</h3>
+      <label>День</label>
+      <input type="number" id="currDay" min="0">
+      <label>Ночь</label>
+      <input type="number" id="currNight" min="0">
+    </div>
+
+    <div class="section">
+      <h3>Прошлые показания</h3>
+      <label>День</label>
+      <input type="number" id="prevDay" min="0">
+      <label>Ночь</label>
+      <input type="number" id="prevNight" min="0">
+    </div>
+
+    <div class="section">
+      <h3>Тарифы</h3>
+      <label>День</label>
+      <input type="number" id="tariffDay" step="0.01" value="4.6">
+      <label>Ночь</label>
+      <input type="number" id="tariffNight" step="0.01" value="2.3">
+    </div>
+
+    <button onclick="calculate()">Рассчитать</button>
+
+    <table id="resultTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Период</th>
+          <th>Расход</th>
+          <th>Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>День</td>
+          <td id="dayUsage"></td>
+          <td id="dayAmount"></td>
+        </tr>
+        <tr>
+          <td>Ночь</td>
+          <td id="nightUsage"></td>
+          <td id="nightAmount"></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Итого</td>
+          <td id="totalAmount"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <script>
+    function calculate() {
+      const prevDay = parseFloat(document.getElementById('prevDay').value) || 0;
+      const prevNight = parseFloat(document.getElementById('prevNight').value) || 0;
+      const currDay = parseFloat(document.getElementById('currDay').value) || 0;
+      const currNight = parseFloat(document.getElementById('currNight').value) || 0;
+      const tariffDay = parseFloat(document.getElementById('tariffDay').value) || 0;
+      const tariffNight = parseFloat(document.getElementById('tariffNight').value) || 0;
+
+      const dayUsage = Math.max(0, currDay - prevDay);
+      const nightUsage = Math.max(0, currNight - prevNight);
+
+      const dayAmount = dayUsage * tariffDay;
+      const nightAmount = nightUsage * tariffNight;
+      const total = dayAmount + nightAmount;
+
+      document.getElementById('dayUsage').textContent = dayUsage.toFixed(2);
+      document.getElementById('nightUsage').textContent = nightUsage.toFixed(2);
+      document.getElementById('dayAmount').textContent = dayAmount.toFixed(2) + ' грн';
+      document.getElementById('nightAmount').textContent = nightAmount.toFixed(2) + ' грн';
+      document.getElementById('totalAmount').textContent = total.toFixed(2) + ' грн';
+
+      document.getElementById('resultTable').style.display = 'table';
+    }
+  </script>
+</body>
+</html>
