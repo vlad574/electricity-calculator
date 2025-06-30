@@ -35,7 +35,7 @@
       animation: fadeIn 0.6s ease;
     }
 
-    h2 {
+    h2, h3 {
       color: var(--accent);
       margin-bottom: 1rem;
       text-align: center;
@@ -51,18 +51,31 @@
       font-weight: bold;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: calc(100% - 1.2rem);
       padding: 0.6rem;
       margin-bottom: 1rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       transition: border-color 0.3s;
+      background-color: white;
+      font-size: 1rem;
+      color: var(--font);
     }
 
-    input[type="number"]:focus {
+    input[type="number"]:focus,
+    select:focus {
       border-color: var(--accent);
       outline: none;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%234a90e2' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.7rem center;
+      background-size: 1rem;
     }
 
     button {
@@ -102,6 +115,41 @@
       font-weight: bold;
     }
 
+    #templateText {
+      margin-top: 1.5rem;
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .notify {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #224d7f;
+      color: white;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-weight: bold;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.5s, transform 0.5s;
+      display: none;
+      left: 0;
+      right: 0;
+      width: 90%;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .notify.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     @keyframes fadeIn {
       from {opacity: 0; transform: translateY(20px);}
       to {opacity: 1; transform: translateY(0);}
@@ -111,19 +159,29 @@
       from {opacity: 0; transform: translateY(10px);}
       to {opacity: 1; transform: translateY(0);}
     }
-@media (max-width: 991px) {
-    .calculator{
-      padding: 1rem;
-      border-radius: 0;
+
+    @media (max-width: 991px) {
+      .calculator {
+        padding: 1rem;
+        border-radius: 0;
+      }
+
+      body {
+        padding: 0;
+      }
     }
-  body{
-      padding:0 ;
-  }
-}
   </style>
 </head>
 <body>
   <div class="calculator">
+    <div class="section">
+      <h3>Номер дома</h3>
+      <select id="numHouse">
+        <option value="111">111</option>
+        <option value="114">114</option>
+      </select>
+    </div>
+
     <div class="section">
       <h3>Текущие показания</h3>
       <label>День</label>
@@ -177,7 +235,11 @@
         </tr>
       </tfoot>
     </table>
+
+    <p id="templateText" onclick="copyTemplateToClipboard()"></p>
   </div>
+
+  <div id="notify" class="notify">Шаблон скопирован в буфер обмена</div>
 
   <script>
     function calculate() {
@@ -202,6 +264,27 @@
       document.getElementById('totalAmount').textContent = total.toFixed(2) + ' грн';
 
       document.getElementById('resultTable').style.display = 'table';
+
+      const houseNumber = document.getElementById('numHouse').value;
+      const template = `Рубінова ${houseNumber}. Гончаренко Віталій день ${prevDay} - ${currDay} ніч ${prevNight} - ${currNight}`;
+      document.getElementById('templateText').textContent = template;
+    }
+
+    function copyTemplateToClipboard() {
+      const text = document.getElementById('templateText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const notify = document.getElementById('notify');
+        notify.classList.add('show');
+        notify.style.display = 'block';
+
+        setTimeout(() => {
+          notify.classList.remove('show');
+        }, 2000);
+
+        setTimeout(() => {
+          notify.style.display = 'none';
+        }, 2500);
+      });
     }
   </script>
 </body>
